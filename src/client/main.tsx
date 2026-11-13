@@ -1,11 +1,12 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, Navigate } from "react-router";
 import { RouterProvider } from "react-router/dom";
 import { Toaster } from "sonner";
 import "./index.css";
-import { ErrorApi } from "./api";
+import { AvisoSinConexion } from "./components/AvisoSinConexion";
+import { crearQueryClient, persistidor } from "./consultas";
 import { Raiz, SoloAdultos } from "./Raiz";
 import { Hoy } from "./pantallas/Hoy";
 import { Familia, HoyDeMiembro } from "./pantallas/Familia";
@@ -17,17 +18,7 @@ import { AdminMiembros, EditarMiembro, NuevoMiembro } from "./pantallas/admin/Mi
 import { AdminTareas } from "./pantallas/admin/Tareas";
 import { AdminAcceso } from "./pantallas/admin/Acceso";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      // Ver spec: los datos se refrescan al volver a la app y cada ~15 s.
-      refetchOnWindowFocus: true,
-      refetchInterval: 15_000,
-      // Solo se reintentan los errores de red, no las respuestas de la API.
-      retry: (intentos, error) => intentos < 1 && (!(error instanceof ErrorApi) || error.codigo === "sin_conexion"),
-    },
-  },
-});
+const queryClient = crearQueryClient();
 
 const router = createBrowserRouter([
   {
@@ -59,9 +50,13 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+      client={queryClient}
+      persistOptions={{ persister: persistidor, maxAge: 7 * 24 * 60 * 60 * 1000, buster: __VERSION__ }}
+    >
+      <AvisoSinConexion />
       <RouterProvider router={router} />
       <Toaster position="top-center" richColors />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
   </StrictMode>,
 );

@@ -26,6 +26,7 @@ export function Admin() {
           </li>
         ))}
       </ul>
+      <p className="mt-10 text-center text-xs text-muted-foreground">El Granero · versión {__VERSION__}</p>
     </Pantalla>
   );
 }

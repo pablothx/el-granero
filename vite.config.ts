@@ -5,7 +5,11 @@ import { fileURLToPath, URL } from "node:url";
 import { defineConfig } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
+// Identifica cada build: invalida la caché guardada en el dispositivo y se muestra en Administrar.
+const VERSION = process.env.VERSION ?? new Date().toISOString().slice(0, 16).replace("T", " ");
+
 export default defineConfig({
+  define: { __VERSION__: JSON.stringify(VERSION) },
   plugins: [
     react(),
     tailwindcss(),

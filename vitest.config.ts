@@ -25,6 +25,7 @@ export default defineConfig(async () => {
         {
           // Tests de componentes del cliente con lógica propia.
           plugins: [react()],
+          define: { __VERSION__: JSON.stringify("test") },
           resolve: { alias: { "@": fileURLToPath(new URL("./src/client", import.meta.url)) } },
           test: {
             name: "cliente",

@@ -16,8 +16,8 @@ Contexto único: un `CONTEXT.md` y `docs/adr/` en la raíz del repo. Ver `docs/a
 
 Requiere **npm 11** (con el npm 10 de Node 22 la instalación falla por un bug del resolvedor). Usar `npx npm@11 …` si el npm del sistema es más viejo.
 
-- `npm run dev`: front, API y D1 local juntos (aplicar antes `npm run db:migrate:local`).
-- `npm test`: tests del Worker en el runtime de Workers, contra D1 local. El reloj se fija con `relojFijo` (ver `test/`).
+- `npm run dev`: front, API y D1 local juntos (aplicar antes `npm run db:migrate:local`, y copiar `.dev.vars.example` a `.dev.vars` para el token de instalación).
+- `npm test`: dos proyectos de Vitest. `worker` (en `test/`): tests del Worker en el runtime de Workers, contra D1 local, con el reloj fijado por `relojFijo` y cada dispositivo simulado con `Sistema.dispositivo()`. `cliente` (`src/client/**/*.test.tsx`): tests de componentes con jsdom. Filtrar con `--project worker` o `--project cliente`.
 - `npm run typecheck` / `npm run build`.
 - `npm run db:generate`: genera una migración de Drizzle después de cambiar el esquema.
 - `npm run cf-typegen`: regenera los tipos de `Env` y del runtime después de cambiar `wrangler.jsonc`.
