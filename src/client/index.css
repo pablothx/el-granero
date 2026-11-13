@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(0.985 0.012 85);
+  --foreground: oklch(0.25 0.03 50);
+  --primary: oklch(0.55 0.15 55);
+  --primary-foreground: oklch(0.985 0.012 85);
+  --muted: oklch(0.94 0.02 80);
+  --muted-foreground: oklch(0.5 0.03 55);
+  --border: oklch(0.88 0.03 75);
+  --ring: oklch(0.55 0.15 55);
+  --radius: 0.875rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.2 0.02 50);
+    --foreground: oklch(0.95 0.02 80);
+    --primary: oklch(0.72 0.15 65);
+    --primary-foreground: oklch(0.2 0.02 50);
+    --muted: oklch(0.27 0.02 50);
+    --muted-foreground: oklch(0.75 0.03 70);
+    --border: oklch(0.33 0.02 50);
+    --ring: oklch(0.72 0.15 65);
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-sm: calc(var(--radius) - 8px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
