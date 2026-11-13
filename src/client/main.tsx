@@ -8,6 +8,7 @@ import "./index.css";
 import { ErrorApi } from "./api";
 import { Raiz, SoloAdultos } from "./Raiz";
 import { Hoy } from "./pantallas/Hoy";
+import { Familia, HoyDeMiembro } from "./pantallas/Familia";
 import { Admin } from "./pantallas/admin/Admin";
 import { NuevaTarea } from "./pantallas/admin/NuevaTarea";
 import { EditarTarea } from "./pantallas/admin/EditarTarea";
@@ -35,6 +36,8 @@ const router = createBrowserRouter([
       {
         element: <SoloAdultos />,
         children: [
+          { path: "familia", element: <Familia /> },
+          { path: "familia/:id", element: <HoyDeMiembro /> },
           { path: "admin", element: <Admin /> },
           { path: "admin/tareas", element: <AdminTareas /> },
           { path: "admin/tareas/nueva", element: <NuevaTarea /> },

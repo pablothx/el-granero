@@ -8,6 +8,7 @@ import { exigirMiembro, obtenerFamilia, validar, type Ctx, type Entorno } from "
 import { fallar } from "../errores";
 import { asegurarOcurrencias, descartarPendienteActual, listarHoy, listarTerminadas, reglaDe, type Tarea } from "../ocurrencias";
 import { exigirAdulto } from "../permisos";
+import { aMiembroPublico } from "./acceso";
 
 export async function hoyDeLaFamilia(c: Ctx) {
   const { zonaHoraria } = await obtenerFamilia(c.var.db);
@@ -169,6 +170,32 @@ export const rutasTareas = new Hono<Entorno>()
     const { hoy, zonaHoraria } = await hoyDeLaFamilia(c);
     await asegurarOcurrencias(c.var.db, hoy);
     return c.json({ fecha: hoy, ocurrencias: await listarHoy(c.var.db, miembro.id, hoy, zonaHoraria) });
+  })
+
+  /** Vista Familia: progreso de hoy de cada Miembro activo. */
+  .get("/familia", async (c) => {
+    exigirAdulto(c);
+    const { hoy, zonaHoraria } = await hoyDeLaFamilia(c);
+    await asegurarOcurrencias(c.var.db, hoy);
+    const activos = await c.var.db.query.miembros.findMany({ where: eq(miembros.archivado, false), orderBy: [asc(miembros.nombre)] });
+    const progreso = await Promise.all(
+      activos.map(async (m) => {
+        const deHoy = await listarHoy(c.var.db, m.id, hoy, zonaHoraria);
+        return { miembro: aMiembroPublico(m), cumplidas: deHoy.filter((o) => o.estado === "cumplida").length, total: deHoy.length };
+      }),
+    );
+    return c.json({ fecha: hoy, miembros: progreso });
+  })
+
+  /** El Hoy de cualquier Miembro (para un Adulto, desde la Vista Familia). */
+  .get("/miembros/:id/hoy", idParam, async (c) => {
+    exigirAdulto(c);
+    const { id } = c.req.valid("param");
+    const miembro = await c.var.db.query.miembros.findFirst({ where: eq(miembros.id, id) });
+    if (!miembro) fallar("no_encontrado", "Ese Miembro no existe");
+    const { hoy, zonaHoraria } = await hoyDeLaFamilia(c);
+    await asegurarOcurrencias(c.var.db, hoy);
+    return c.json({ fecha: hoy, miembro: aMiembroPublico(miembro), ocurrencias: await listarHoy(c.var.db, id, hoy, zonaHoraria) });
   })
 
   /** Ocurrencias de Períodos terminados en los últimos `dias` días (para revisar y corregir). */

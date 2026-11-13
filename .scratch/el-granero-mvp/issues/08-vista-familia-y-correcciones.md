@@ -8,8 +8,12 @@ Ver la spec, sección Reglas.
 
 **Status:** ready-for-agent
 
-- [ ] La Vista Familia es solo para Adultos (requiere reingreso reciente) y lista a cada Miembro activo con Cumplidas / total de su Hoy.
-- [ ] Desde la Vista Familia, el Adulto abre el Hoy de cualquier Miembro y tilda o destilda por él; queda registrado que la tildó el Adulto.
-- [ ] El Adulto puede ver Ocurrencias de Períodos recientes terminados de un Miembro y pasarlas de No cumplida a Cumplida y viceversa.
-- [ ] El Hoy del Adulto muestra solo sus propias Ocurrencias.
-- [ ] Tests: el progreso de la Vista Familia coincide con el Hoy de cada Miembro; un Chico no accede a la Vista Familia; corregir una No cumplida de ayer la deja Cumplida con quién y cuándo.
+- [x] La Vista Familia es solo para Adultos (requiere reingreso reciente) y lista a cada Miembro activo con Cumplidas / total de su Hoy.
+- [x] Desde la Vista Familia, el Adulto abre el Hoy de cualquier Miembro y tilda o destilda por él; queda registrado que la tildó el Adulto.
+- [x] El Adulto puede ver Ocurrencias de Períodos recientes terminados de un Miembro y pasarlas de No cumplida a Cumplida y viceversa.
+- [x] El Hoy del Adulto muestra solo sus propias Ocurrencias.
+- [x] Tests: el progreso de la Vista Familia coincide con el Hoy de cada Miembro; un Chico no accede a la Vista Familia; corregir una No cumplida de ayer la deja Cumplida con quién y cuándo.
+
+## Comments
+
+**2026-11-13, implementación:** verificado con tests del Worker (progreso igual al Hoy de cada Miembro, Chico sin acceso, reingreso, tildar por otro, corregir ayer en ambos sentidos) y en el navegador (Vista Familia, Hoy de Tomi, tildar por él, corregir un día anterior). Muestra las últimas 2 semanas de Períodos terminados.
