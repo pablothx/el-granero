@@ -97,3 +97,20 @@ export const ocurrencias = sqliteTable(
   },
   (t) => [uniqueIndex("ocurrencias_tarea_inicio").on(t.tareaId, t.inicio), index("ocurrencias_miembro_fin").on(t.miembroId, t.fin)],
 );
+
+/** Algo que hace falta comprar, en una de las dos Listas fijas. */
+export const items = sqliteTable(
+  "items",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    lista: text("lista", { enum: ["super", "generales"] }).notNull(),
+    texto: text("texto").notNull(),
+    anotadoPorId: integer("anotado_por_id")
+      .notNull()
+      .references(() => miembros.id),
+    anotadoEn: instante("anotado_en").notNull(),
+    compradoPorId: integer("comprado_por_id").references(() => miembros.id),
+    compradoEn: instante("comprado_en"),
+  },
+  (t) => [index("items_lista").on(t.lista)],
+);

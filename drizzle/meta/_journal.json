@@ -15,6 +15,13 @@
       "when": 1794606087978,
       "tag": "0001_tareas_y_ocurrencias",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794606922875,
+      "tag": "0002_items",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CalendarCheck, LogOut, Settings, Users, type LucideIcon } from "lucide-react";
+import { CalendarCheck, LogOut, Settings, ShoppingCart, Users, type LucideIcon } from "lucide-react";
 import { NavLink } from "react-router";
 import { Avatar } from "@/components/Avatar";
 import { DialogoReingreso } from "@/components/DialogoReingreso";
@@ -16,6 +16,7 @@ interface Seccion {
 
 const SECCIONES: Seccion[] = [
   { ruta: "/hoy", nombre: "Hoy", icono: CalendarCheck },
+  { ruta: "/listas", nombre: "Compras", icono: ShoppingCart },
   { ruta: "/familia", nombre: "Familia", icono: Users, soloAdultos: true },
   { ruta: "/admin", nombre: "Administrar", icono: Settings, soloAdultos: true },
 ];

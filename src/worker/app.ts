@@ -3,6 +3,7 @@ import { cargarContexto, type Entorno } from "./contexto";
 import { manejarError } from "./errores";
 import type { Reloj } from "./reloj";
 import { rutasAcceso } from "./rutas/acceso";
+import { rutasListas } from "./rutas/listas";
 import { rutasMiembros } from "./rutas/miembros";
 import { rutasTareas } from "./rutas/tareas";
 
@@ -17,7 +18,8 @@ export function crearApp({ reloj }: Dependencias) {
     .use(cargarContexto(reloj))
     .route("/", rutasAcceso)
     .route("/", rutasMiembros)
-    .route("/", rutasTareas);
+    .route("/", rutasTareas)
+    .route("/", rutasListas);
 }
 
 export type AppType = ReturnType<typeof crearApp>;

@@ -9,6 +9,7 @@ import { ErrorApi } from "./api";
 import { Raiz, SoloAdultos } from "./Raiz";
 import { Hoy } from "./pantallas/Hoy";
 import { Familia, HoyDeMiembro } from "./pantallas/Familia";
+import { Listas } from "./pantallas/Listas";
 import { Admin } from "./pantallas/admin/Admin";
 import { NuevaTarea } from "./pantallas/admin/NuevaTarea";
 import { EditarTarea } from "./pantallas/admin/EditarTarea";
@@ -33,6 +34,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/hoy" replace /> },
       { path: "hoy", element: <Hoy /> },
+      { path: "listas", element: <Navigate to="/listas/super" replace /> },
+      { path: "listas/:lista", element: <Listas /> },
       {
         element: <SoloAdultos />,
         children: [
