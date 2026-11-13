@@ -3,10 +3,10 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { nombreSchema } from "../../shared/dominio";
 import { miembros, ocurrencias, tareas } from "../../shared/esquema";
-import { diasAMascara, FRECUENCIAS, fechaLocal, periodoTerminado, type DiaSemana } from "../../shared/periodos";
+import { diasAMascara, FRECUENCIAS, fechaLocal, periodoTerminado, sumarDias, type DiaSemana } from "../../shared/periodos";
 import { exigirMiembro, obtenerFamilia, validar, type Ctx, type Entorno } from "../contexto";
 import { fallar } from "../errores";
-import { asegurarOcurrencias, listarHoy, reglaDe, type Tarea } from "../ocurrencias";
+import { asegurarOcurrencias, listarHoy, listarTerminadas, reglaDe, type Tarea } from "../ocurrencias";
 import { exigirAdulto } from "../permisos";
 
 export async function hoyDeLaFamilia(c: Ctx) {
@@ -82,6 +82,20 @@ export const rutasTareas = new Hono<Entorno>()
     await asegurarOcurrencias(c.var.db, hoy);
     return c.json({ fecha: hoy, ocurrencias: await listarHoy(c.var.db, miembro.id, hoy, zonaHoraria) });
   })
+
+  /** Ocurrencias de Períodos terminados en los últimos `dias` días (para revisar y corregir). */
+  .get(
+    "/miembros/:id/terminadas",
+    validar("param", z.object({ id: z.coerce.number().int() })),
+    validar("query", z.object({ dias: z.coerce.number().int().min(1).max(62).default(14) })),
+    async (c) => {
+      exigirAdulto(c);
+      const { id } = c.req.valid("param");
+      const { hoy, zonaHoraria } = await hoyDeLaFamilia(c);
+      const desde = sumarDias(hoy, -c.req.valid("query").dias);
+      return c.json({ fecha: hoy, ocurrencias: await listarTerminadas(c.var.db, id, desde, hoy, zonaHoraria) });
+    },
+  )
 
   .post("/ocurrencias/:id/tildar", validar("param", z.object({ id: z.coerce.number().int() })), async (c) => {
     const ocurrencia = await ocurrenciaEditable(c, c.req.valid("param").id);
