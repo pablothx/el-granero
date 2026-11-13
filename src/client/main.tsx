@@ -10,6 +10,7 @@ import { Raiz, SoloAdultos } from "./Raiz";
 import { Hoy } from "./pantallas/Hoy";
 import { Admin } from "./pantallas/admin/Admin";
 import { NuevaTarea } from "./pantallas/admin/NuevaTarea";
+import { EditarTarea } from "./pantallas/admin/EditarTarea";
 import { AdminMiembros, EditarMiembro, NuevoMiembro } from "./pantallas/admin/Miembros";
 import { AdminTareas } from "./pantallas/admin/Tareas";
 
@@ -37,6 +38,7 @@ const router = createBrowserRouter([
           { path: "admin", element: <Admin /> },
           { path: "admin/tareas", element: <AdminTareas /> },
           { path: "admin/tareas/nueva", element: <NuevaTarea /> },
+          { path: "admin/tareas/:id", element: <EditarTarea /> },
           { path: "admin/miembros", element: <AdminMiembros /> },
           { path: "admin/miembros/nuevo", element: <NuevoMiembro /> },
           { path: "admin/miembros/:id", element: <EditarMiembro /> },
