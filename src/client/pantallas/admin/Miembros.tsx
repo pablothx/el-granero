@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { toast } from "sonner";
-import { api, mensajeDeError, pedir } from "../../api";
+import { api, ErrorApi, mensajeDeError, pedir } from "../../api";
+import { BotonConfirmar } from "@/components/BotonConfirmar";
 import { CLAVE_ESTADO } from "../../estado";
 import { CLAVE_AVATARES, CLAVE_MIEMBROS, useMiembros, type MiembroAdmin } from "../../miembros";
 
@@ -131,11 +132,74 @@ export function EditarMiembro() {
   );
 }
 
-/** Acciones extra sobre un Miembro: cambiar el PIN (y archivar, ticket 11). */
+/** Acciones extra sobre un Miembro: cambiar el PIN, archivar, reactivar y borrar. */
 function AccionesMiembro({ miembro }: { miembro: MiembroAdmin }) {
   return (
     <div className="mt-8 flex flex-col gap-6 border-t pt-6">
-      <CambiarPin miembro={miembro} />
+      {!miembro.archivado && <CambiarPin miembro={miembro} />}
+      <ArchivarOBorrar miembro={miembro} />
+    </div>
+  );
+}
+
+type TareaPendiente = { id: number; nombre: string; emoji: string | null };
+
+function ArchivarOBorrar({ miembro }: { miembro: MiembroAdmin }) {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const param = { param: { id: String(miembro.id) } };
+  const refrescar = () =>
+    Promise.all([
+      queryClient.invalidateQueries({ queryKey: CLAVE_MIEMBROS }),
+      queryClient.invalidateQueries({ queryKey: CLAVE_AVATARES }),
+      queryClient.invalidateQueries({ queryKey: ["familia"] }),
+    ]);
+  const archivar = useMutation({ mutationFn: () => pedir(() => api.miembros[":id"].archivar.$post(param)), onSuccess: refrescar });
+  const reactivar = useMutation({ mutationFn: () => pedir(() => api.miembros[":id"].reactivar.$post(param)), onSuccess: refrescar });
+  const borrar = useMutation({
+    mutationFn: () => pedir(() => api.miembros[":id"].$delete(param)),
+    onSuccess: async () => {
+      await refrescar();
+      navigate("/admin/miembros");
+    },
+  });
+  const pendientes = archivar.error instanceof ErrorApi ? (archivar.error.datos.tareas as TareaPendiente[] | undefined) : undefined;
+  const error = archivar.error ?? reactivar.error ?? borrar.error;
+
+  return (
+    <div className="flex flex-col gap-3">
+      {miembro.archivado ? (
+        <>
+          <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">Archivado: no aparece en los Avatares y no puede entrar. Su historial se conserva.</p>
+          <BotonConfirmar variant="secondary" confirmar="Tocá de nuevo para reactivar" onConfirmar={() => reactivar.mutate()} disabled={reactivar.isPending}>
+            Reactivar
+          </BotonConfirmar>
+        </>
+      ) : (
+        <BotonConfirmar confirmar="Tocá de nuevo para archivar" onConfirmar={() => archivar.mutate()} disabled={archivar.isPending}>
+          Archivar
+        </BotonConfirmar>
+      )}
+      {pendientes?.length ? (
+        <div className="rounded-2xl bg-destructive/10 p-4">
+          <p className="mb-2 font-medium text-destructive">Antes reasigná o archivá sus Tareas activas:</p>
+          <ul className="flex flex-col gap-1">
+            {pendientes.map((t) => (
+              <li key={t.id}>
+                <Link to={`/admin/tareas/${t.id}`} className="font-semibold text-primary underline">
+                  {t.emoji} {t.nombre}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <MensajeError>{error && mensajeDeError(error)}</MensajeError>
+      )}
+      <BotonConfirmar confirmar="Tocá de nuevo para borrar" onConfirmar={() => borrar.mutate()} disabled={borrar.isPending}>
+        Borrar
+      </BotonConfirmar>
+      <p className="text-xs text-muted-foreground">Solo se puede borrar un Miembro sin historial (por ejemplo, cargado por error). Si ya tiene, archivalo.</p>
     </div>
   );
 }
