@@ -4,9 +4,12 @@ import { Link, useNavigate, useParams } from "react-router";
 import { Avatar } from "@/components/Avatar";
 import { avatarAlAzar, type Color, type Emoji } from "@/components/ElegirAvatar";
 import { FormMiembro, type DatosMiembro } from "@/components/FormMiembro";
-import { Pantalla, Titulo } from "@/components/Pantalla";
+import { MensajeError, Pantalla, Titulo } from "@/components/Pantalla";
 import { Volver } from "@/components/Volver";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { toast } from "sonner";
 import { api, mensajeDeError, pedir } from "../../api";
 import { CLAVE_ESTADO } from "../../estado";
 import { CLAVE_AVATARES, CLAVE_MIEMBROS, useMiembros, type MiembroAdmin } from "../../miembros";
@@ -128,7 +131,51 @@ export function EditarMiembro() {
   );
 }
 
-/** Acciones extra sobre un Miembro (PIN, archivar); las suman los tickets 10 y 11. */
-function AccionesMiembro(_: { miembro: MiembroAdmin }) {
-  return null;
+/** Acciones extra sobre un Miembro: cambiar el PIN (y archivar, ticket 11). */
+function AccionesMiembro({ miembro }: { miembro: MiembroAdmin }) {
+  return (
+    <div className="mt-8 flex flex-col gap-6 border-t pt-6">
+      <CambiarPin miembro={miembro} />
+    </div>
+  );
+}
+
+function CambiarPin({ miembro }: { miembro: MiembroAdmin }) {
+  const [pin, setPin] = useState("");
+  const cambiar = useMutation({
+    mutationFn: () => pedir(() => api.miembros[":id"].pin.$put({ param: { id: String(miembro.id) }, json: { pin } })),
+    onSuccess: () => {
+      setPin("");
+      toast.success(`Listo: ${miembro.nombre} tiene PIN nuevo`);
+    },
+  });
+  return (
+    <form
+      className="flex flex-col gap-2"
+      onSubmit={(e) => {
+        e.preventDefault();
+        cambiar.mutate();
+      }}
+    >
+      <h2 className="text-lg font-bold">Cambiar PIN</h2>
+      <div className="flex gap-2">
+        <Input
+          aria-label="PIN nuevo"
+          type="password"
+          inputMode="numeric"
+          pattern="\d{4}"
+          maxLength={4}
+          placeholder="PIN nuevo"
+          value={pin}
+          onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+          required
+          autoComplete="off"
+        />
+        <Button type="submit" variant="secondary" disabled={cambiar.isPending || pin.length !== 4}>
+          Cambiar
+        </Button>
+      </div>
+      <MensajeError>{cambiar.isError && mensajeDeError(cambiar.error)}</MensajeError>
+    </form>
+  );
 }

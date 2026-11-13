@@ -15,6 +15,7 @@ import { NuevaTarea } from "./pantallas/admin/NuevaTarea";
 import { EditarTarea } from "./pantallas/admin/EditarTarea";
 import { AdminMiembros, EditarMiembro, NuevoMiembro } from "./pantallas/admin/Miembros";
 import { AdminTareas } from "./pantallas/admin/Tareas";
+import { AdminAcceso } from "./pantallas/admin/Acceso";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -48,6 +49,7 @@ const router = createBrowserRouter([
           { path: "admin/miembros", element: <AdminMiembros /> },
           { path: "admin/miembros/nuevo", element: <NuevoMiembro /> },
           { path: "admin/miembros/:id", element: <EditarMiembro /> },
+          { path: "admin/acceso", element: <AdminAcceso /> },
         ],
       },
       { path: "*", element: <Navigate to="/hoy" replace /> },

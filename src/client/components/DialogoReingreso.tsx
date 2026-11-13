@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { api, ErrorApi, mensajeDeError, registrarReingreso } from "../api";
+import { api, ErrorApi, registrarReingreso } from "../api";
+import { mensajeDePin } from "../pantallas/Entrar";
 import { useMiembroActual } from "../estado";
 import { Avatar } from "./Avatar";
 import { TecladoPin } from "./TecladoPin";
@@ -44,12 +45,12 @@ export function DialogoReingreso() {
     try {
       const r = await api.reingresar.$post({ json: { pin } });
       if (!r.ok) {
-        const datos = (await r.json().catch(() => ({}))) as { error?: string; mensaje?: string };
-        throw new ErrorApi((datos.error as never) ?? "interno", datos.error === "pin_incorrecto" ? "PIN incorrecto. Probá otra vez." : (datos.mensaje ?? "Algo salió mal"));
+        const datos = (await r.json().catch(() => ({}))) as Record<string, unknown>;
+        throw new ErrorApi((datos.error as never) ?? "interno", String(datos.mensaje ?? "Algo salió mal"), datos);
       }
       cerrar(true);
     } catch (e) {
-      setError(mensajeDeError(e));
+      setError(mensajeDePin(e));
     } finally {
       setOcupado(false);
     }

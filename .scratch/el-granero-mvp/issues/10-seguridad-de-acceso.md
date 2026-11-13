@@ -8,11 +8,15 @@ Ver la spec, sección Acceso, y ADR 0002.
 
 **Status:** ready-for-agent
 
-- [ ] 5 PIN fallidos seguidos para un Miembro en un Dispositivo vinculado lo bloquean 5 minutos; un ingreso correcto reinicia el contador.
-- [ ] Un Adulto puede cambiar el PIN de cualquier Miembro.
-- [ ] Si hay un solo Adulto activo, puede resetear su propio PIN ingresando la Clave de la casa desde la pantalla de PIN.
-- [ ] La lista de Dispositivos vinculados muestra nombre y último uso; el último uso se actualiza al usarlos.
-- [ ] Desvincular un dispositivo invalida su cookie y sus sesiones; ese dispositivo vuelve a la pantalla de vinculación.
-- [ ] Cambiar la Clave de la casa borra todos los Dispositivos vinculados y sus sesiones, menos el actual.
-- [ ] Todas estas acciones de Adulto requieren reingreso reciente.
-- [ ] Tests del Worker cubren el bloqueo y el desbloqueo con el reloj avanzado, los dos tipos de reset y la desvinculación (puntual y por cambio de Clave).
+- [x] 5 PIN fallidos seguidos para un Miembro en un Dispositivo vinculado lo bloquean 5 minutos; un ingreso correcto reinicia el contador.
+- [x] Un Adulto puede cambiar el PIN de cualquier Miembro.
+- [x] Si hay un solo Adulto activo, puede resetear su propio PIN ingresando la Clave de la casa desde la pantalla de PIN.
+- [x] La lista de Dispositivos vinculados muestra nombre y último uso; el último uso se actualiza al usarlos.
+- [x] Desvincular un dispositivo invalida su cookie y sus sesiones; ese dispositivo vuelve a la pantalla de vinculación.
+- [x] Cambiar la Clave de la casa borra todos los Dispositivos vinculados y sus sesiones, menos el actual.
+- [x] Todas estas acciones de Adulto requieren reingreso reciente.
+- [x] Tests del Worker cubren el bloqueo y el desbloqueo con el reloj avanzado, los dos tipos de reset y la desvinculación (puntual y por cambio de Clave).
+
+## Comments
+
+**2026-11-13, implementación:** verificado con tests del Worker (bloqueo y desbloqueo con el reloj, reinicio del contador, reingreso cuenta para el bloqueo, cambio de PIN, reset del único Adulto con la Clave y sus rechazos, lista y desvinculación de dispositivos, cambio de Clave) y en el navegador (cambiar PIN, desvincular, bloqueo tras 5 fallos, '¿Olvidaste tu PIN?'). **Pendiente fuera de alcance:** los intentos de Clave de la casa en `/vincular` y `/restablecer-pin` no tienen límite; convendría un bloqueo similar (por IP o global) antes de exponer la app.

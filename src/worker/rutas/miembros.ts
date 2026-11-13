@@ -3,7 +3,8 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { avatarSchema, nombreSchema, pinSchema, ROLES } from "../../shared/dominio";
 import { miembros, sesiones } from "../../shared/esquema";
-import { hashSecreto, verificarSecreto } from "../cripto";
+import { hashSecreto } from "../cripto";
+import { olvidarIntentos, verificarPin } from "../pin";
 import { exigirMiembro, validar, type Entorno, type Miembro } from "../contexto";
 import { fallar } from "../errores";
 import { exigirAdulto } from "../permisos";
@@ -18,7 +19,7 @@ const idParam = validar("param", z.object({ id: z.coerce.number().int() }));
 export const rutasMiembros = new Hono<Entorno>()
   .post("/reingresar", validar("json", z.object({ pin: z.string() })), async (c) => {
     const miembro = exigirMiembro(c);
-    if (!(await verificarSecreto(c.req.valid("json").pin, miembro.pinHash))) fallar("pin_incorrecto", "PIN incorrecto");
+    await verificarPin(c, c.var.dispositivo!.id, miembro, c.req.valid("json").pin);
     await c.var.db.update(sesiones).set({ ultimoPinAt: c.var.reloj.ahora() }).where(eq(sesiones.id, c.var.sesion!.id));
     return c.json({ ok: true });
   })
@@ -72,4 +73,15 @@ export const rutasMiembros = new Hono<Entorno>()
         .returning();
       return c.json({ miembro: aMiembroAdmin(actualizado!) });
     },
-  );
+  )
+
+  /** Un Adulto le pone un PIN nuevo a cualquier Miembro. */
+  .put("/miembros/:id/pin", idParam, validar("json", z.object({ pin: pinSchema })), async (c) => {
+    exigirAdulto(c);
+    const { id } = c.req.valid("param");
+    const miembro = await c.var.db.query.miembros.findFirst({ where: eq(miembros.id, id) });
+    if (!miembro) fallar("no_encontrado", "Ese Miembro no existe");
+    await c.var.db.update(miembros).set({ pinHash: await hashSecreto(c.req.valid("json").pin) }).where(eq(miembros.id, id));
+    await olvidarIntentos(c, id);
+    return c.json({ ok: true });
+  });

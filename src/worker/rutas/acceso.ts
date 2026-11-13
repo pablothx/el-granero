@@ -1,4 +1,4 @@
-import { and, count, eq } from "drizzle-orm";
+import { and, count, eq, ne } from "drizzle-orm";
 import { Hono } from "hono";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { z } from "zod";
@@ -25,6 +25,8 @@ import {
   type Miembro,
 } from "../contexto";
 import { fallar } from "../errores";
+import { olvidarIntentos, verificarPin } from "../pin";
+import { exigirAdulto } from "../permisos";
 
 export function aMiembroPublico(m: Miembro): MiembroPublico {
   return { id: m.id, nombre: m.nombre, rol: m.rol, emoji: m.avatarEmoji, color: m.avatarColor };
@@ -137,9 +139,61 @@ export const rutasAcceso = new Hono<Entorno>()
       where: and(eq(miembros.id, miembroId), eq(miembros.archivado, false)),
     });
     if (!miembro) fallar("no_encontrado", "Ese Miembro no existe");
-    if (!(await verificarSecreto(pin, miembro.pinHash))) fallar("pin_incorrecto", "PIN incorrecto");
+    await verificarPin(c, dispositivo.id, miembro, pin);
     await abrirSesion(c, dispositivo.id, miembro.id);
     return c.json({ miembro: aMiembroPublico(miembro) });
+  })
+
+  /** Si hay un solo Adulto activo, puede poner un PIN nuevo con la Clave de la casa. */
+  .post(
+    "/restablecer-pin",
+    validar("json", z.object({ miembroId: z.number().int(), clave: z.string(), pin: pinSchema })),
+    async (c) => {
+      exigirDispositivo(c);
+      const { miembroId, clave, pin } = c.req.valid("json");
+      const db = c.var.db;
+      const adultos = await db.query.miembros.findMany({ where: and(eq(miembros.rol, "adulto"), eq(miembros.archivado, false)) });
+      if (adultos.length !== 1 || adultos[0]!.id !== miembroId) {
+        fallar("prohibido", "Pedile a un Adulto que te ponga un PIN nuevo");
+      }
+      const configuracion = await obtenerFamilia(db);
+      if (!(await verificarSecreto(clave, configuracion.claveHash))) fallar("clave_incorrecta", "La Clave de la casa no es correcta");
+      await db.update(miembros).set({ pinHash: await hashSecreto(pin) }).where(eq(miembros.id, miembroId));
+      await olvidarIntentos(c, miembroId);
+      return c.json({ ok: true });
+    },
+  )
+
+  .get("/dispositivos", async (c) => {
+    exigirAdulto(c);
+    const todos = await c.var.db.query.dispositivos.findMany({ orderBy: (d, { desc }) => [desc(d.ultimoUsoAt)] });
+    return c.json({
+      dispositivos: todos.map((d) => ({
+        id: d.id,
+        nombre: d.nombre,
+        ultimoUso: d.ultimoUsoAt.toISOString(),
+        vinculado: d.createdAt.toISOString(),
+        actual: d.id === c.var.dispositivo!.id,
+      })),
+    });
+  })
+
+  .delete("/dispositivos/:id", validar("param", z.object({ id: z.coerce.number().int() })), async (c) => {
+    exigirAdulto(c);
+    const { id } = c.req.valid("param");
+    await c.var.db.delete(sesiones).where(eq(sesiones.dispositivoId, id));
+    await c.var.db.delete(dispositivos).where(eq(dispositivos.id, id));
+    return c.json({ ok: true });
+  })
+
+  /** Cambiar la Clave de la casa desvincula todos los dispositivos menos el actual. */
+  .post("/clave", validar("json", z.object({ clave: claveSchema })), async (c) => {
+    exigirAdulto(c);
+    const actual = c.var.dispositivo!.id;
+    await c.var.db.update(familia).set({ claveHash: await hashSecreto(c.req.valid("json").clave) }).where(eq(familia.id, 1));
+    await c.var.db.delete(sesiones).where(ne(sesiones.dispositivoId, actual));
+    await c.var.db.delete(dispositivos).where(ne(dispositivos.id, actual));
+    return c.json({ ok: true });
   })
 
   .post("/salir", async (c) => {
