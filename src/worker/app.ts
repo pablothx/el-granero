@@ -1,25 +1,19 @@
-import { count } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/d1";
 import { Hono } from "hono";
-import { familia } from "../shared/esquema";
+import { cargarContexto, type Entorno } from "./contexto";
+import { manejarError } from "./errores";
 import type { Reloj } from "./reloj";
+import { rutasAcceso } from "./rutas/acceso";
 
 export interface Dependencias {
   reloj: Reloj;
 }
 
 export function crearApp({ reloj }: Dependencias) {
-  return new Hono<{ Bindings: Env }>()
+  return new Hono<Entorno>()
     .basePath("/api")
-    .get("/estado", async (c) => {
-      const db = drizzle(c.env.DB);
-      const [fila] = await db.select({ total: count() }).from(familia);
-      return c.json({
-        app: "El Granero",
-        familiaConfigurada: (fila?.total ?? 0) > 0,
-        ahora: reloj.ahora().toISOString(),
-      });
-    });
+    .onError(manejarError)
+    .use(cargarContexto(reloj))
+    .route("/", rutasAcceso);
 }
 
 export type AppType = ReturnType<typeof crearApp>;

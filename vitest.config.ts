@@ -7,12 +7,12 @@ export default defineConfig(async () => {
     plugins: [
       cloudflareTest({
         wrangler: { configPath: "./wrangler.jsonc" },
-        miniflare: { bindings: { TEST_MIGRATIONS: migraciones } },
+        miniflare: { bindings: { TEST_MIGRATIONS: migraciones, TOKEN_INSTALACION: "token-de-prueba" } },
       }),
     ],
     test: {
       include: ["test/**/*.test.ts"],
-      setupFiles: ["./test/aplicar-migraciones.ts"],
+      setupFiles: ["./test/aplicar-migraciones.ts", "./test/vaciar-antes-de-cada-test.ts"],
     },
   };
 });

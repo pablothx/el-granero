@@ -16,16 +16,18 @@
     "cf-typegen": "wrangler types src/worker/env.d.ts --include-runtime=false --include-main-module=false && wrangler types src/worker/runtime.d.ts --include-env=false"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.9.1",
     "@tanstack/react-query": "^5.107.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "cn": "^0.5.2",
     "drizzle-orm": "^0.45.4",
     "hono": "^4.13.18",
+    "lucide-react": "^1.72.0",
     "radix-ui": "^1.8.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router": "^8.5.1",
+    "sonner": "^2.0.8",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.7"
   },

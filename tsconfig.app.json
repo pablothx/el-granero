@@ -17,5 +17,5 @@
     "noEmit": true,
     "paths": { "@/*": ["./src/client/*"] }
   },
-  "include": ["src/client", "src/shared", "src/worker/env.d.ts"]
+  "include": ["src/client", "src/shared", "src/worker/env.d.ts", "src/worker/secretos.d.ts"]
 }
