@@ -1,0 +1,2 @@
+# Copiar a .dev.vars para desarrollo local. En producción: npx wrangler secret put TOKEN_INSTALACION
+TOKEN_INSTALACION=granero-dev
