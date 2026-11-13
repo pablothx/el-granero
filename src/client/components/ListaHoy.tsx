@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { OcurrenciaVista } from "../ocurrencias";
 
-const TITULOS = { diaria: "Hoy", semanal: "Esta semana", mensual: "Este mes" } as const;
+const TITULOS = { diaria: "Del día", semanal: "Esta semana", mensual: "Este mes" } as const;
 
 /** Las Ocurrencias de un Hoy: Pendientes agrupadas por tipo y, abajo, lo Cumplido hoy. */
 export function ListaHoy({

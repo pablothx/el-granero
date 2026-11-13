@@ -8,10 +8,14 @@ Ver la spec, secciones Módulos y Reglas.
 
 **Status:** ready-for-agent
 
-- [ ] El módulo de Períodos soporta Semanal (lunes 00:00 a lunes 00:00 local) y Mensual (mes calendario), y Diarias con días de la semana elegidos (vacío = todos).
-- [ ] Una Diaria con días elegidos solo genera Ocurrencia en esos días.
-- [ ] Hoy muestra: Diarias de hoy; Semanales y Mensuales Pendientes del Período actual; Cumplidas cuyo tilde fue hoy.
-- [ ] Orden: Pendientes agrupadas en Diarias, Semanales y Mensuales, alfabético dentro de cada grupo; después las Cumplidas de hoy, tachadas.
-- [ ] Una Semanal tildada el lunes aparece tachada el lunes y no aparece el martes.
-- [ ] El formulario de Tarea permite elegir Frecuencia y días de la semana.
-- [ ] Tests de Períodos: cambio de semana de domingo a lunes, fin de mes (incluido febrero en año bisiesto y en año común), Diaria lunes/miércoles/viernes.
+- [x] El módulo de Períodos soporta Semanal (lunes 00:00 a lunes 00:00 local) y Mensual (mes calendario), y Diarias con días de la semana elegidos (vacío = todos).
+- [x] Una Diaria con días elegidos solo genera Ocurrencia en esos días.
+- [x] Hoy muestra: Diarias de hoy; Semanales y Mensuales Pendientes del Período actual; Cumplidas cuyo tilde fue hoy.
+- [x] Orden: Pendientes agrupadas en Diarias, Semanales y Mensuales, alfabético dentro de cada grupo; después las Cumplidas de hoy, tachadas.
+- [x] Una Semanal tildada el lunes aparece tachada el lunes y no aparece el martes.
+- [x] El formulario de Tarea permite elegir Frecuencia y días de la semana.
+- [x] Tests de Períodos: cambio de semana de domingo a lunes, fin de mes (incluido febrero en año bisiesto y en año común), Diaria lunes/miércoles/viernes.
+
+## Comments
+
+**2026-11-13, implementación:** tests puros de Períodos (cambio de semana, fin de mes, febrero común y bisiesto, diciembre, Diaria L/M/V) y del Worker (agrupación y orden de Hoy, Semanal tildada ayer, Semanal Pendiente toda la semana, Mensual). En el navegador: formulario con Frecuencia y días, y Hoy agrupado.
