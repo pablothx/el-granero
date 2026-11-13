@@ -105,3 +105,18 @@ export async function familiaConfigurada(ahora = "2026-11-16T10:00:00-03:00"): P
   if (r.status !== 201) throw new Error(`configuración inicial falló: ${JSON.stringify(r.cuerpo)}`);
   return { sistema, reloj, casa, adultoId: r.cuerpo.miembro.id };
 }
+
+export async function crearTarea(
+  d: Dispositivo,
+  datos: { nombre: string; miembroId: number; frecuencia?: "diaria" | "semanal" | "mensual"; dias?: number[]; emoji?: string },
+) {
+  const r = await d.post("/tareas", { frecuencia: "diaria", dias: [], ...datos });
+  if (r.status !== 201) throw new Error(`crear Tarea falló: ${JSON.stringify(r.cuerpo)}`);
+  return r.cuerpo.tarea as { id: number };
+}
+
+export async function hoy(d: Dispositivo, ruta = "/hoy") {
+  const r = await d.get(ruta);
+  if (r.status !== 200) throw new Error(`Hoy falló: ${JSON.stringify(r.cuerpo)}`);
+  return r.cuerpo as { fecha: string; ocurrencias: Array<{ id: number; nombre: string; tipo: string; estado: string; tildadaPor: { nombre: string } | null; tildadaEn: string | null; inicio: string; fin: string }> };
+}

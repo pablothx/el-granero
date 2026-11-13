@@ -7,6 +7,9 @@ import { Toaster } from "sonner";
 import "./index.css";
 import { Raiz } from "./Raiz";
 import { Hoy } from "./pantallas/Hoy";
+import { Admin } from "./pantallas/admin/Admin";
+import { NuevaTarea } from "./pantallas/admin/NuevaTarea";
+import { AdminTareas } from "./pantallas/admin/Tareas";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +28,9 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/hoy" replace /> },
       { path: "hoy", element: <Hoy /> },
+      { path: "admin", element: <Admin /> },
+      { path: "admin/tareas", element: <AdminTareas /> },
+      { path: "admin/tareas/nueva", element: <NuevaTarea /> },
       { path: "*", element: <Navigate to="/hoy" replace /> },
     ],
   },

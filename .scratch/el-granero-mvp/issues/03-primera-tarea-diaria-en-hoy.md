@@ -8,11 +8,15 @@ Ver la spec, secciones Módulos, Modelo de datos y Reglas, y ADR 0005.
 
 **Status:** ready-for-agent
 
-- [ ] Un Adulto puede crear una Tarea Diaria con nombre, emoji opcional y Miembro asignado (por ahora él mismo).
-- [ ] Crear la Tarea genera su Ocurrencia Pendiente del Período actual en ese momento.
-- [ ] El módulo de Períodos es una función pura que, dado un instante, la zona horaria de la Familia y una Frecuencia, devuelve el Período (inicio y fin); el día va de 00:00 a 00:00 local.
-- [ ] Leer Hoy asegura de forma idempotente que exista la Ocurrencia del Período actual (clave única Tarea + inicio del Período); leerlo dos veces no duplica.
-- [ ] Cada Ocurrencia guarda el Miembro al que estaba asignada al crearse.
-- [ ] Tildar guarda quién y cuándo; destildar borra ambos datos.
-- [ ] Hoy muestra las Pendientes arriba y las Cumplidas hoy abajo, tachadas.
-- [ ] Test: con el reloj fijado a las 23:59 y luego a las 00:01 hora de Buenos Aires, Hoy muestra la Ocurrencia de cada día, y no cambia a las 21:00 (medianoche UTC).
+- [x] Un Adulto puede crear una Tarea Diaria con nombre, emoji opcional y Miembro asignado (por ahora él mismo).
+- [x] Crear la Tarea genera su Ocurrencia Pendiente del Período actual en ese momento.
+- [x] El módulo de Períodos es una función pura que, dado un instante, la zona horaria de la Familia y una Frecuencia, devuelve el Período (inicio y fin); el día va de 00:00 a 00:00 local.
+- [x] Leer Hoy asegura de forma idempotente que exista la Ocurrencia del Período actual (clave única Tarea + inicio del Período); leerlo dos veces no duplica.
+- [x] Cada Ocurrencia guarda el Miembro al que estaba asignada al crearse.
+- [x] Tildar guarda quién y cuándo; destildar borra ambos datos.
+- [x] Hoy muestra las Pendientes arriba y las Cumplidas hoy abajo, tachadas.
+- [x] Test: con el reloj fijado a las 23:59 y luego a las 00:01 hora de Buenos Aires, Hoy muestra la Ocurrencia de cada día, y no cambia a las 21:00 (medianoche UTC).
+
+## Comments
+
+**2026-11-13, implementación:** verificado con tests del Worker (incluido el cambio de día a las 00:00 de Buenos Aires y no a las 21:00) y en el navegador (crear Tarea, verla en Hoy, tildar). El módulo de Períodos ya soporta las tres Frecuencias y el formulario ya permite elegirlas; el ticket 05 suma sus tests.

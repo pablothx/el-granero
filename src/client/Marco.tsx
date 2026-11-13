@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CalendarCheck, LogOut, type LucideIcon } from "lucide-react";
+import { CalendarCheck, LogOut, Settings, type LucideIcon } from "lucide-react";
 import { NavLink } from "react-router";
 import { Avatar } from "@/components/Avatar";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,10 @@ interface Seccion {
   soloAdultos?: boolean;
 }
 
-const SECCIONES: Seccion[] = [{ ruta: "/hoy", nombre: "Hoy", icono: CalendarCheck }];
+const SECCIONES: Seccion[] = [
+  { ruta: "/hoy", nombre: "Hoy", icono: CalendarCheck },
+  { ruta: "/admin", nombre: "Administrar", icono: Settings, soloAdultos: true },
+];
 
 /** Encabezado con el Miembro actual y barra de navegación inferior. */
 export function Marco({ children }: { children: React.ReactNode }) {

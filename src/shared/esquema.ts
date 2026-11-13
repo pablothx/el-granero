@@ -1,4 +1,4 @@
-import { integer, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 const instante = (nombre: string) => integer(nombre, { mode: "timestamp_ms" });
 
@@ -58,4 +58,42 @@ export const intentosPin = sqliteTable(
     bloqueadoHasta: instante("bloqueado_hasta"),
   },
   (t) => [primaryKey({ columns: [t.dispositivoId, t.miembroId] })],
+);
+
+export const tareas = sqliteTable("tareas", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  nombre: text("nombre").notNull(),
+  emoji: text("emoji"),
+  frecuencia: text("frecuencia", { enum: ["diaria", "semanal", "mensual"] }).notNull(),
+  /** Solo Diaria: máscara de días de la semana (bit 0 = lunes); 0 = todos. */
+  diasSemana: integer("dias_semana").notNull().default(0),
+  miembroId: integer("miembro_id")
+    .notNull()
+    .references(() => miembros.id),
+  archivada: integer("archivada", { mode: "boolean" }).notNull().default(false),
+  createdAt: instante("created_at").notNull(),
+});
+
+/**
+ * Cada Período concreto de una Tarea (ADR 0005). El estado se deriva:
+ * Cumplida si tiene tilde; si no, Pendiente o No cumplida según el Período.
+ */
+export const ocurrencias = sqliteTable(
+  "ocurrencias",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    tareaId: integer("tarea_id")
+      .notNull()
+      .references(() => tareas.id, { onDelete: "cascade" }),
+    /** Miembro asignado al crearse; no cambia si después se reasigna la Tarea. */
+    miembroId: integer("miembro_id")
+      .notNull()
+      .references(() => miembros.id),
+    /** Fechas locales de la Familia, YYYY-MM-DD; `fin` excluido. */
+    inicio: text("inicio").notNull(),
+    fin: text("fin").notNull(),
+    tildadaPorId: integer("tildada_por_id").references(() => miembros.id),
+    tildadaEn: instante("tildada_en"),
+  },
+  (t) => [uniqueIndex("ocurrencias_tarea_inicio").on(t.tareaId, t.inicio), index("ocurrencias_miembro_fin").on(t.miembroId, t.fin)],
 );

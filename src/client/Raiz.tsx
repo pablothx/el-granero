@@ -1,4 +1,4 @@
-import { Outlet } from "react-router";
+import { Outlet, ScrollRestoration } from "react-router";
 import { Marco } from "./Marco";
 import { useEstado } from "./estado";
 import { ConfiguracionInicial } from "./pantallas/ConfiguracionInicial";
@@ -33,6 +33,7 @@ export function Raiz() {
   if (!miembro) return <Entrar />;
   return (
     <Marco>
+      <ScrollRestoration />
       <Outlet />
     </Marco>
   );
