@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CalendarCheck, LogOut, Settings, type LucideIcon } from "lucide-react";
 import { NavLink } from "react-router";
 import { Avatar } from "@/components/Avatar";
+import { DialogoReingreso } from "@/components/DialogoReingreso";
 import { cn } from "@/lib/utils";
 import { api, pedir } from "./api";
 import { reiniciarSesion, useMiembroActual } from "./estado";
@@ -44,6 +45,7 @@ export function Marco({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       {children}
+      <DialogoReingreso />
       {secciones.length > 1 && (
         <nav className="fixed inset-x-0 bottom-0 z-10 border-t bg-background/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
           <ul className="mx-auto flex max-w-md">

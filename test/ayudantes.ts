@@ -120,3 +120,26 @@ export async function hoy(d: Dispositivo, ruta = "/hoy") {
   if (r.status !== 200) throw new Error(`Hoy falló: ${JSON.stringify(r.cuerpo)}`);
   return r.cuerpo as { fecha: string; ocurrencias: Array<{ id: number; nombre: string; tipo: string; estado: string; tildadaPor: { nombre: string } | null; tildadaEn: string | null; inicio: string; fin: string }> };
 }
+
+export async function crearMiembro(
+  d: Dispositivo,
+  datos: { nombre: string; rol?: "adulto" | "chico"; pin?: string; emoji?: string; color?: string },
+) {
+  const r = await d.post("/miembros", {
+    nombre: datos.nombre,
+    rol: datos.rol ?? "chico",
+    pin: datos.pin ?? "2222",
+    avatar: { emoji: datos.emoji ?? "🐶", color: datos.color ?? "#3b82f6" },
+  });
+  if (r.status !== 201) throw new Error(`crear Miembro falló: ${JSON.stringify(r.cuerpo)}`);
+  return r.cuerpo.miembro.id as number;
+}
+
+/** Un dispositivo nuevo, vinculado con la Clave de la casa y con la sesión del Miembro abierta. */
+export async function dispositivoDe(sistema: Sistema, miembroId: number, pin: string) {
+  const d = sistema.dispositivo();
+  await d.post("/vincular", { clave: CLAVE, nombre: "Otro" });
+  const r = await d.entrar(miembroId, pin);
+  if (r.status !== 200) throw new Error(`entrar falló: ${JSON.stringify(r.cuerpo)}`);
+  return d;
+}

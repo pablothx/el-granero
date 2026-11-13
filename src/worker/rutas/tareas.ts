@@ -107,6 +107,9 @@ async function ocurrenciaEditable(c: Ctx, id: number) {
     if (ocurrencia.miembroId !== miembro.id) fallar("prohibido", "Solo podés tildar tus propias Tareas");
     const { hoy } = await hoyDeLaFamilia(c);
     if (periodoTerminado(ocurrencia, hoy)) fallar("prohibido", "Ese Período ya terminó");
+  } else if (ocurrencia.miembroId !== miembro.id) {
+    // Tildar por otro es una acción de Adulto (se hace desde la Vista Familia).
+    exigirAdulto(c);
   }
   return ocurrencia;
 }

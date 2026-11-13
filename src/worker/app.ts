@@ -3,6 +3,7 @@ import { cargarContexto, type Entorno } from "./contexto";
 import { manejarError } from "./errores";
 import type { Reloj } from "./reloj";
 import { rutasAcceso } from "./rutas/acceso";
+import { rutasMiembros } from "./rutas/miembros";
 import { rutasTareas } from "./rutas/tareas";
 
 export interface Dependencias {
@@ -15,6 +16,7 @@ export function crearApp({ reloj }: Dependencias) {
     .onError(manejarError)
     .use(cargarContexto(reloj))
     .route("/", rutasAcceso)
+    .route("/", rutasMiembros)
     .route("/", rutasTareas);
 }
 

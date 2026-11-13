@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { Avatar } from "@/components/Avatar";
 import { Pantalla, Titulo } from "@/components/Pantalla";
 import { TecladoPin } from "@/components/TecladoPin";
@@ -39,10 +40,14 @@ export function Entrar() {
 
 function PedirPin({ miembro, onVolver }: { miembro: MiembroPublico; onVolver: () => void }) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const entrar = useMutation({
     mutationFn: (pin: string) => pedir(() => api.entrar.$post({ json: { miembroId: miembro.id, pin } })),
-    onSuccess: () => reiniciarSesion(queryClient),
+    onSuccess: async () => {
+      navigate("/hoy", { replace: true });
+      await reiniciarSesion(queryClient);
+    },
     onError: (e) => setError(e instanceof ErrorApi && e.codigo === "pin_incorrecto" ? "PIN incorrecto. Probá otra vez." : mensajeDeError(e)),
   });
 

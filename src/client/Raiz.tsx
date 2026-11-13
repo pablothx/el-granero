@@ -1,6 +1,6 @@
-import { Outlet, ScrollRestoration } from "react-router";
+import { Navigate, Outlet, ScrollRestoration } from "react-router";
 import { Marco } from "./Marco";
-import { useEstado } from "./estado";
+import { useEstado, useMiembroActual } from "./estado";
 import { ConfiguracionInicial } from "./pantallas/ConfiguracionInicial";
 import { Entrar } from "./pantallas/Entrar";
 import { Vincular } from "./pantallas/Vincular";
@@ -37,4 +37,10 @@ export function Raiz() {
       <Outlet />
     </Marco>
   );
+}
+
+/** Rutas solo para Adultos: un Chico vuelve a Hoy. */
+export function SoloAdultos() {
+  const miembro = useMiembroActual();
+  return miembro.rol === "adulto" ? <Outlet /> : <Navigate to="/hoy" replace />;
 }
