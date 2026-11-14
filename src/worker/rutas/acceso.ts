@@ -11,7 +11,8 @@ import {
   type MiembroPublico,
 } from "../../shared/dominio";
 import { dispositivos, familia, miembros, sesiones } from "../../shared/esquema";
-import { generarToken, hashSecreto, hashToken, verificarSecreto } from "../cripto";
+import { verificarClave } from "../clave";
+import { generarToken, hashSecreto, hashToken } from "../cripto";
 import {
   COOKIE_DISPOSITIVO,
   COOKIE_SESION,
@@ -116,9 +117,7 @@ export const rutasAcceso = new Hono<Entorno>()
   .post("/vincular", validar("json", z.object({ clave: z.string(), nombre: nombreDispositivoSchema })), async (c) => {
     const { clave, nombre } = c.req.valid("json");
     const configuracion = await obtenerFamilia(c.var.db);
-    if (!(await verificarSecreto(clave, configuracion.claveHash))) {
-      fallar("clave_incorrecta", "La Clave de la casa no es correcta");
-    }
+    await verificarClave(c, clave, configuracion.claveHash);
     await vincularDispositivo(c, nombre);
     return c.json({ vinculado: true }, 201);
   })
@@ -157,7 +156,7 @@ export const rutasAcceso = new Hono<Entorno>()
         fallar("prohibido", "Pedile a un Adulto que te ponga un PIN nuevo");
       }
       const configuracion = await obtenerFamilia(db);
-      if (!(await verificarSecreto(clave, configuracion.claveHash))) fallar("clave_incorrecta", "La Clave de la casa no es correcta");
+      await verificarClave(c, clave, configuracion.claveHash);
       await db.update(miembros).set({ pinHash: await hashSecreto(pin) }).where(eq(miembros.id, miembroId));
       await olvidarIntentos(c, miembroId);
       return c.json({ ok: true });

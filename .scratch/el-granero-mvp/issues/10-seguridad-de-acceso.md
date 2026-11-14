@@ -19,4 +19,4 @@ Ver la spec, sección Acceso, y ADR 0002.
 
 ## Comments
 
-**2026-11-13, implementación:** verificado con tests del Worker (bloqueo y desbloqueo con el reloj, reinicio del contador, reingreso cuenta para el bloqueo, cambio de PIN, reset del único Adulto con la Clave y sus rechazos, lista y desvinculación de dispositivos, cambio de Clave) y en el navegador (cambiar PIN, desvincular, bloqueo tras 5 fallos, '¿Olvidaste tu PIN?'). **Pendiente fuera de alcance:** los intentos de Clave de la casa en `/vincular` y `/restablecer-pin` no tienen límite; convendría un bloqueo similar (por IP o global) antes de exponer la app.
+**2026-11-13, implementación:** verificado con tests del Worker (bloqueo y desbloqueo con el reloj, reinicio del contador, reingreso cuenta para el bloqueo, cambio de PIN, reset del único Adulto con la Clave y sus rechazos, lista y desvinculación de dispositivos, cambio de Clave) y en el navegador (cambiar PIN, desvincular, bloqueo tras 5 fallos, '¿Olvidaste tu PIN?'). **Pendiente fuera de alcance:** los intentos de Clave de la casa en `/vincular` y `/restablecer-pin` no tienen límite; resuelto en el ticket 13 (bloqueo por IP).

@@ -60,6 +60,13 @@ export const intentosPin = sqliteTable(
   (t) => [primaryKey({ columns: [t.dispositivoId, t.miembroId] })],
 );
 
+/** Intentos fallidos de Clave de la casa desde una IP (no hay dispositivo todavía). */
+export const intentosClave = sqliteTable("intentos_clave", {
+  ip: text("ip").primaryKey(),
+  fallos: integer("fallos").notNull(),
+  bloqueadoHasta: instante("bloqueado_hasta"),
+});
+
 export const tareas = sqliteTable("tareas", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   nombre: text("nombre").notNull(),

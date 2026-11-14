@@ -10,7 +10,7 @@ export const MINUTO = 60_000;
 export const HORA = 60 * MINUTO;
 export const DIA = 24 * HORA;
 
-const TABLAS = ["items", "ocurrencias", "tareas", "intentos_pin", "sesiones", "dispositivos", "miembros", "familia"];
+const TABLAS = ["items", "ocurrencias", "tareas", "intentos_pin", "intentos_clave", "sesiones", "dispositivos", "miembros", "familia"];
 
 export async function vaciarBase() {
   const existentes = await env.DB.prepare("SELECT name FROM sqlite_master WHERE type = 'table'").all<{ name: string }>();
@@ -26,10 +26,14 @@ export type Respuesta<T = any> = { status: number; cuerpo: T };
  */
 export class Dispositivo {
   private cookies = new Map<string, string>();
-  constructor(readonly sistema: Sistema) {}
+  constructor(
+    readonly sistema: Sistema,
+    /** IP desde la que pide, como la informa Cloudflare en CF-Connecting-IP. */
+    readonly ip = "203.0.113.1",
+  ) {}
 
   async pedir<T = any>(metodo: string, ruta: string, cuerpo?: unknown): Promise<Respuesta<T>> {
-    const headers = new Headers();
+    const headers = new Headers({ "cf-connecting-ip": this.ip });
     if (cuerpo !== undefined) headers.set("content-type", "application/json");
     if (this.cookies.size) headers.set("cookie", [...this.cookies].map(([k, v]) => `${k}=${v}`).join("; "));
     const ctx = createExecutionContext();
@@ -71,8 +75,8 @@ export class Sistema {
     this.worker = crearWorker({ reloj });
   }
 
-  dispositivo() {
-    return new Dispositivo(this);
+  dispositivo({ ip }: { ip?: string } = {}) {
+    return new Dispositivo(this, ip);
   }
 
   async correrCron() {
